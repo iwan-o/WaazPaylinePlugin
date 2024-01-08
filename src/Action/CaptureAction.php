@@ -129,6 +129,8 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface
 
         $transactionReference = $payment->getOrder()->getNumber();
 
+        $customerEmail = ($payment->getOrder()->getCustomer()) ? $payment->getOrder()->getCustomer()->getEmail() : null;
+
         $model['transactionReference'] = $transactionReference;
 
         $simplePayment = new SimplePayment(
@@ -141,6 +143,7 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface
             $targetUrl,
             $currencyCode,
             $transactionReference,
+            $customerEmail,
             $automaticResponseUrl,
             $cancelUrl
         );

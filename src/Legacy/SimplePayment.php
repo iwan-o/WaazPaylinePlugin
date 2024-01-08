@@ -73,6 +73,11 @@ final class SimplePayment
     private $cancelUrl;
 
     /**
+     * @var string
+     */
+    private $customerEmail;
+
+    /**
      * @param Payline $payline
      * @param $merchantId
      * @param $environment
@@ -92,6 +97,7 @@ final class SimplePayment
         $targetUrl,
         $currency,
         $transactionReference,
+        $customerEmail,
         $automaticResponseUrl,
         $cancelUrl
     )
@@ -104,6 +110,7 @@ final class SimplePayment
         $this->merchantId = $merchantId;
         $this->accessKey = $accessKey;
         $this->amount = $amount;
+        $this->customerEmail = $customerEmail;
         $this->currency = $currency;
         $this->targetUrl = $targetUrl;
         $this->cancelUrl = $cancelUrl;
@@ -124,6 +131,9 @@ final class SimplePayment
               'ref' => $this->transactionReference,
               'amount' => $this->amount,
               'currency' => CurrencyNumber::getByCode($this->currency),
+          ],
+          'buyer' => [
+              'email' => $this->customerEmail,
           ],
           'cancel_url' => $this->cancelUrl,
           'return_url' => $this->targetUrl,
