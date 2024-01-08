@@ -19,6 +19,11 @@ class Payline
     private $logger;
 
     /**
+     * @var string
+     */
+    private $cacheDir;
+
+    /**
      * @var array
      */
     private $mandatoryFields = array(
@@ -50,11 +55,12 @@ class Payline
      */
     private $token;
 
-    public function __construct($key, $logDir, LoggerInterface $logger)
+    public function __construct($key, $logDir, LoggerInterface $logger, string $cacheDir)
     {
         $this->key = $key;
         $this->logDir = $logDir;
         $this->logger = $logger;
+        $this->cacheDir = $cacheDir;
         $this->mandatoryFields['order']['date'] = gmdate('d/m/Y h:i');
 
     }
@@ -94,6 +100,8 @@ class Payline
         $request = $this->getRequest();
         // create an instance
         $paylineSDK = new PaylineSDK($request['merchant_id'], $request['access_key'], null, null, null, null, $request['environment'], $this->logDir, Logger::INFO, $this->logger);
+
+        $paylineSDK->setFailoverOptions('cache_file_path', $this->cacheDir);
 
         // call a web service, for example doWebPayment
         $doWebPaymentRequest = array();
@@ -137,6 +145,8 @@ class Payline
       $request = $this->getRequest();
       // create an instance
       $paylineSDK = new PaylineSDK($request['merchant_id'], $request['access_key'], null, null, null, null, $request['environment'], $this->logDir, Logger::INFO, $this->logger);
+
+      $paylineSDK->setFailoverOptions('cache_file_path', $this->cacheDir);
 
       $webPaymentDetails = $paylineSDK->getWebPaymentDetails($params);
 

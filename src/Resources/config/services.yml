@@ -46,4 +46,4 @@ services:
             - '@request_stack'
             - '%kernel.logs_dir%/%kernel.environment%.log'
             - '@logger'
-          
+            - '%kernel.cache_dir%'

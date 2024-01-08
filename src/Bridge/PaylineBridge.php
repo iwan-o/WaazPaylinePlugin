@@ -55,13 +55,19 @@ final class PaylineBridge implements PaylineBridgeInterface
     private $logger;
 
     /**
+     * @var string
+     */
+    private $cacheDir;
+
+    /**
      * @param RequestStack $requestStack
      */
-    public function __construct(RequestStack $requestStack, string $logDir, LoggerInterface $logger)
+    public function __construct(RequestStack $requestStack, string $logDir, LoggerInterface $logger, string $cacheDir)
     {
         $this->requestStack = $requestStack;
         $this->logDir = $logDir;
         $this->logger = $logger;
+        $this->cacheDir = $cacheDir;
     }
 
     /**
@@ -69,7 +75,7 @@ final class PaylineBridge implements PaylineBridgeInterface
      */
     public function createPayline($accessKey)
     {
-        return new Payline($accessKey, $this->logDir, $this->logger);
+        return new Payline($accessKey, $this->logDir, $this->logger, $this->cacheDir);
     }
 
     /**
