@@ -2,14 +2,21 @@
 
 namespace Waaz\PaylinePlugin\Legacy;
 
+use Monolog\Logger;
 use Payline\PaylineSDK;
+use Psr\Log\LoggerInterface;
 
 /**
  * @author Ibes Mongabure <developpement@studiowaaz.com>
  */
 class Payline
 {
-    private $projectDir;
+    private $logDir;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     /**
      * @var array
@@ -43,10 +50,11 @@ class Payline
      */
     private $token;
 
-    public function __construct($key, $projectDir)
+    public function __construct($key, $logDir, LoggerInterface $logger)
     {
         $this->key = $key;
-        $this->projectDir = $projectDir;
+        $this->logDir = $logDir;
+        $this->logger = $logger;
         $this->mandatoryFields['order']['date'] = gmdate('d/m/Y h:i');
 
     }
@@ -85,7 +93,7 @@ class Payline
 
         $request = $this->getRequest();
         // create an instance
-        $paylineSDK = new PaylineSDK($request['merchant_id'], $request['access_key'], null, null, null, null, $request['environment'], $this->projectDir.'/../var/log/');
+        $paylineSDK = new PaylineSDK($request['merchant_id'], $request['access_key'], null, null, null, null, $request['environment'], $this->logDir, Logger::INFO, $this->logger);
 
         // call a web service, for example doWebPayment
         $doWebPaymentRequest = array();
@@ -101,6 +109,9 @@ class Payline
         $doWebPaymentRequest['order']['amount'] = $request['order']['amount']; // may differ from payment.amount if currency is different
         $doWebPaymentRequest['order']['currency'] = $request['order']['currency']; // ISO 4217 code for euro
         $doWebPaymentRequest['order']['date'] = gmdate('d/m/Y h:i'); // ISO 4217 code for euro
+
+        // BUYER
+        $doWebPaymentRequest['buyer']['email'] = $request['buyer']['email']; // the email of the customer
 
         // CONTRACT NUMBERS
         $doWebPaymentRequest['payment']['contractNumber'] = $request['payment']['contractNumber'];
@@ -125,7 +136,7 @@ class Payline
     {
       $request = $this->getRequest();
       // create an instance
-      $paylineSDK = new PaylineSDK($request['merchant_id'], $request['access_key'], null, null, null, null, $request['environment'], $this->projectDir.'/../var/log/');
+      $paylineSDK = new PaylineSDK($request['merchant_id'], $request['access_key'], null, null, null, null, $request['environment'], $this->logDir, Logger::INFO, $this->logger);
 
       $webPaymentDetails = $paylineSDK->getWebPaymentDetails($params);
 

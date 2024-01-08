@@ -12,7 +12,7 @@ namespace Waaz\PaylinePlugin\Bridge;
 
 use Waaz\PaylinePlugin\Legacy\Payline;
 use Symfony\Component\HttpFoundation\RequestStack;
-
+use Psr\Log\LoggerInterface;
 
 /**
  * @author Ibes Mongabure <developpement@studiowaaz.com>
@@ -47,15 +47,21 @@ final class PaylineBridge implements PaylineBridgeInterface
     /**
      * @var string
      */
-    private $projectDir;
+    private $logDir;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     /**
      * @param RequestStack $requestStack
      */
-    public function __construct(RequestStack $requestStack, string $projectDir)
+    public function __construct(RequestStack $requestStack, string $logDir, LoggerInterface $logger)
     {
         $this->requestStack = $requestStack;
-        $this->projectDir = $projectDir;
+        $this->logDir = $logDir;
+        $this->logger = $logger;
     }
 
     /**
@@ -63,7 +69,7 @@ final class PaylineBridge implements PaylineBridgeInterface
      */
     public function createPayline($accessKey)
     {
-        return new Payline($accessKey, $this->projectDir);
+        return new Payline($accessKey, $this->logDir, $this->logger);
     }
 
     /**
