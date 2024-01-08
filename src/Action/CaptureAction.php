@@ -45,7 +45,7 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface
     /**
      * @var UrlGeneratorInterface
      */
-     private $router;
+    private $router;
 
     /**
      * @param Payum $payum
@@ -118,7 +118,7 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface
         $paiementContractNumber = $this->paylineBridge->getPaiementContractNumber();
 
         $automaticResponseUrl = $notifyToken->getTargetUrl();
-        
+
         $currencyCode = $payment->getCurrencyCode();
 
         $targetUrl = $this->router->generate('sylius_shop_order_thank_you', [], UrlGeneratorInterface::ABSOLUTE_URL);
@@ -127,7 +127,7 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface
         //$targetUrl = $request->getToken()->getTargetUrl();
         $amount = $payment->getAmount();
 
-        $transactionReference = $payment->getOrder()->getId();
+        $transactionReference = $payment->getOrder()->getNumber();
 
         $model['transactionReference'] = $transactionReference;
 
