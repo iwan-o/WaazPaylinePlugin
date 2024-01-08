@@ -8,3 +8,4 @@ waaz:
         production: Production
         test: Test
         simulation: Simulation
+        contract_number: Contract number
