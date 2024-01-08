@@ -11,7 +11,8 @@
     ],
     "require": {
         "php": "^7.3",
-        "sylius/sylius": "~1.7.5"
+        "sylius/sylius": "~1.7.5",
+        "monext/payline-sdk": "^4.76"
     },
     "require-dev": {
         "behat/behat": "^3.4",
@@ -36,8 +37,7 @@
         "symfony/dotenv": "^4.2",
         "symfony/intl": "^3.4|^4.1",
         "symfony/web-profiler-bundle": "^3.4|^4.1",
-        "symfony/web-server-bundle": "^3.4|^4.1",
-        "monext/payline-sdk": "^4.76"
+        "symfony/web-server-bundle": "^3.4|^4.1"
     },
     "conflict": {
         "symfony/symfony": "4.1.8",
