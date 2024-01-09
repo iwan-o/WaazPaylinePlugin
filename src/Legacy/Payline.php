@@ -140,16 +140,22 @@ class Payline
 
     }
 
-    public function getPaymentDetails($params)
+    public function getPaymentDetails(string $token)
     {
-      $request = $this->getRequest();
-      // create an instance
-      $paylineSDK = new PaylineSDK($request['merchant_id'], $request['access_key'], null, null, null, null, $request['environment'], $this->logDir, Logger::INFO, $this->logger);
 
-      $paylineSDK->setFailoverOptions('cache_file_path', $this->cacheDir);
+        $params = [
+            'version' => '3',
+            'token' => $token,
+        ];
 
-      $webPaymentDetails = $paylineSDK->getWebPaymentDetails($params);
+        $request = $this->getRequest();
 
-      return $webPaymentDetails;
+        $paylineSDK = new PaylineSDK($request['merchant_id'], $request['access_key'], null, null, null, null, $request['environment'], $this->logDir, Logger::INFO, $this->logger);
+
+        $paylineSDK->setFailoverOptions('cache_file_path', $this->cacheDir);
+
+        $webPaymentDetails = $paylineSDK->getWebPaymentDetails($params);
+
+        return $webPaymentDetails;
     }
 }

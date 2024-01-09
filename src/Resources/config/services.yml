@@ -35,7 +35,7 @@ services:
         class: Waaz\PaylinePlugin\Action\StatusAction
         public: true
         arguments:
-            - '@request_stack'
+            - '@logger'
         tags:
             - { name: payum.action, factory: payline, alias: payum.action.status }
 

@@ -88,23 +88,23 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface
         $token = $request->getToken();
 
         $transactionReference = isset($model['transactionReference']) ? $model['transactionReference'] : null;
+        
 
         if ($transactionReference !== null) {
 
-            if ($this->paylineBridge->isGetMethod()) {
+            $payline = $this->paylineBridge->createPayline();
 
-                $model['status'] = $this->paylineBridge->paymentVerification() ?
-                    PaymentInterface::STATE_COMPLETED : PaymentInterface::STATE_CANCELLED;
+            $token = $this->paylineBridge->paymentVerification();
 
+            $webPaymentDetails = $payline->getPaymentDetails($token);
+
+            if(isset($webPaymentDetails['result']['code'])){
+                $model['status'] = $webPaymentDetails['result']['code'];
                 $request->setModel($model);
-
-                return;
             }
 
-            if ($model['status'] === PaymentInterface::STATE_COMPLETED) {
+            return;
 
-                return;
-            }
         }
 
         $notifyToken = $this->createNotifyToken($token->getGatewayName(), $token->getDetails());
@@ -121,10 +121,10 @@ final class CaptureAction implements ActionInterface, ApiAwareInterface
 
         $currencyCode = $payment->getCurrencyCode();
 
-        $targetUrl = $this->router->generate('sylius_shop_order_thank_you', [], UrlGeneratorInterface::ABSOLUTE_URL);
-        $cancelUrl = $this->router->generate('sylius_shop_order_show', ['tokenValue' => $payment->getOrder()->getTokenValue()], UrlGeneratorInterface::ABSOLUTE_URL);
+        $targetUrl = $token->getTargetUrl();
+        
+        $cancelUrl = $token->getTargetUrl();
 
-        //$targetUrl = $request->getToken()->getTargetUrl();
         $amount = $payment->getAmount();
 
         $transactionReference = $payment->getOrder()->getNumber();

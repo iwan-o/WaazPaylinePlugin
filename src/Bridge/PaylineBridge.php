@@ -73,9 +73,17 @@ final class PaylineBridge implements PaylineBridgeInterface
     /**
      * {@inheritDoc}
      */
-    public function createPayline($accessKey)
+    public function createPayline()
     {
-        return new Payline($accessKey, $this->logDir, $this->logger, $this->cacheDir);
+        $payline = new Payline($this->accessKey, $this->logDir, $this->logger, $this->cacheDir);
+
+        $payline->setFields([
+            'merchant_id' => $this->getMerchantId(),
+            'access_key' => $this->getAccessKey(),
+            'environment' => $this->getEnvironment()
+        ]);
+
+        return $payline;
     }
 
     /**
@@ -87,7 +95,7 @@ final class PaylineBridge implements PaylineBridgeInterface
 
             $postdata = $this->getQueryData();
 
-            return $postdata['token'];
+            return (isset($postdata['paylinetoken'])) ? $postdata['paylinetoken'] : $postdata['token'];
         }
 
         return false;

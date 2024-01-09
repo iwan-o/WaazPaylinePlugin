@@ -16,6 +16,7 @@ use Payum\Core\Bridge\Spl\ArrayObject;
 use Payum\Core\Exception\RequestNotSupportedException;
 use Sylius\Component\Core\Model\PaymentInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Psr\Log\LoggerInterface;
 
 /**
  * @author Ibes Mongabure <developpement@studiowaaz.com>
@@ -23,16 +24,16 @@ use Symfony\Component\HttpFoundation\RequestStack;
 final class StatusAction implements ActionInterface
 {
     /**
-     * @var RequestStack
+     * @var LoggerInterface
      */
-    private $requestStack;
+    private $logger;
 
     /**
-     * @param RequestStack $requestStack
+     * @param LoggerInterface $logger
      */
-    public function __construct(RequestStack $requestStack)
+    public function __construct(LoggerInterface $logger)
     {
-        $this->requestStack = $requestStack;
+        $this->logger = $logger;
     }
 
     /**
@@ -44,34 +45,23 @@ final class StatusAction implements ActionInterface
     {
         RequestNotSupportedException::assertSupports($this, $request);
 
-        $model = ArrayObject::ensureArrayObject($request->getModel());
+        /** @var PaymentInterface $payment */
+        $payment = $request->getFirstModel();
 
-        $requestCurrent = $this->requestStack->getCurrentRequest();
+        $details = $payment->getDetails();
 
-        $transactionReference = isset($model['transactionReference']) ? $model['transactionReference'] : null;
+        if (isset($details['status'])) {
+        
+            if ('00000' === $details['status'] ) {
+                $request->markCaptured();
+                return;
+            } else  {
+                $request->markFailed();
+                return;
+            }
 
-        $status = isset($model['status']) ? $model['status'] : null;
-
-        if ((null === $transactionReference) && !$requestCurrent->isMethod('POST')) {
-
-            $request->markNew();
-
-            return;
         }
-
-        if ($status === PaymentInterface::STATE_CANCELLED) {
-
-            $request->markCanceled();
-
-            return;
-        }
-        if ($status === PaymentInterface::STATE_COMPLETED) {
-
-            $request->markCaptured();
-
-            return;
-        }
-
+    
         $request->markUnknown();
     }
 
@@ -82,7 +72,7 @@ final class StatusAction implements ActionInterface
     {
         return
             $request instanceof GetStatusInterface &&
-            $request->getModel() instanceof \ArrayAccess
+            $request->getFirstModel() instanceof PaymentInterface
         ;
     }
 }

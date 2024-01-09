@@ -21,6 +21,8 @@ use Payum\Core\Request\Notify;
 use Sylius\Component\Payment\PaymentTransitions;
 use Webmozart\Assert\Assert;
 use SM\Factory\FactoryInterface;
+use Symfony\Component\HttpFoundation\Response;
+use Payum\Core\Reply\HttpResponse;
 
 /**
  * @author Ibes Mongabure <developpement@studiowaaz.com>
@@ -54,22 +56,14 @@ final class NotifyAction implements ActionInterface, ApiAwareInterface
     {
         /** @var $request Notify */
         RequestNotSupportedException::assertSupports($this, $request);
-
+        
         if ($this->paylineBridge->paymentVerification()) {
 
-          $accessKey = $this->paylineBridge->getAccessKey();
+          $payline = $this->paylineBridge->createPayline();
 
-          $payline = $this->paylineBridge->createPayline($accessKey);
+          $token = $this->paylineBridge->paymentVerification();
 
-          $payline->setFields([
-            'merchant_id' => $this->paylineBridge->getMerchantId(),
-            'access_key' => $this->paylineBridge->getAccessKey(),
-            'environment' => $this->paylineBridge->getEnvironment()
-          ]);
-          $params['version'] = '3';
-          $params['token'] = $this->paylineBridge->paymentVerification();
-
-          $webPaymentDetails = $payline->getPaymentDetails($params);
+          $webPaymentDetails = $payline->getPaymentDetails($token);
 
           if($webPaymentDetails['result']['code'] == '00000'){
 
@@ -81,7 +75,10 @@ final class NotifyAction implements ActionInterface, ApiAwareInterface
               $this->stateMachineFactory->get($payment, PaymentTransitions::GRAPH)->apply(PaymentTransitions::TRANSITION_COMPLETE);
 
           }
+
         }
+
+        throw new HttpResponse(null, Response::HTTP_OK);
     }
 
     /**

@@ -18,11 +18,9 @@ use Waaz\PaylinePlugin\Legacy\SimplePay;
 interface PaylineBridgeInterface
 {
     /**
-     * @param string $accessKey
-     *
      * @return SimplePay
      */
-    public function createPayline($accessKey);
+    public function createPayline();
 
     /**
      * @return bool
